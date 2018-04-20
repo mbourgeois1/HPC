@@ -50,28 +50,50 @@ for i in range(0,int(n/m)):
 # arry1 = array.astype(np.float)
 # print(arry1)
 
-submatrix_file = open("submatrix_0_0","r")
+#megastuffed = []
 
-doublesub=submatrix_file.readline()
+for i in range(int(n/m)):
+    for j in range(int(n/m)):
+        submatrix_file = open("submatrix_"+ str(i) + "_" + str(j) , "r")
+        doublestuffed = submatrix_file.readline(j)
+        singlestuffed = doublestuffed.strip('[')
+        singlestuffed = singlestuffed.replace(']','')
+        singlestuffed = singlestuffed.split(",")
+        singlestuffed = list(map(float,singlestuffed))
+        #put singlestuffed into megastuffed_i_j
 
 
-#print(doublesub1)
-#doublesub=[float(i) for i in doublesub.split(',')]
-#doublesub1=doublesub.strip('[')
-#doublesub1=doublesub.split(",")
 
-doublesub1=doublesub.strip('[')
-doublesub1 = doublesub1.replace(']','')
-# doublesub1=doublesub1.rstrip(']')
-doublesub1 = doublesub1.astype(np.float)
-#print (doublesub1)
-#doublesub1 = list(map(float, doublesub1))
-#doublesub1=np.fromstring(doublesub1)
-print(type(doublesub1))
-#print(output)
-#print(submatrix_file)
-#print(type(str1))
-#print(a)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# #submatrix_file = open("submatrix_0_0","r")
+#
+# doublesub=submatrix_file.readline()
+#
+#
+#
+#
+# doublesub1=doublesub.strip('[')
+# doublesub1 = doublesub1.replace(']','')
+#
+# doublesub1=doublesub1.split(",")
+# doublesub1 = list(map(float, doublesub1))
+# print(doublesub1)
+
+
+
 
 # def main():
 #     determ = 1
