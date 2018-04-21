@@ -11,7 +11,8 @@ def lu_det():
     log_determ = 0
 
     for k in range(0, int(n / m)):
-        L_inv, U_inv, determ, log_determ = part2(k,k)
+        L_inv, U_inv, sub_determ, sub_log_determ = part2(k,k)
+
         for i in range((k + 1), int(n / m)):
             rightmulti(i,k,U_inv)
         for j in range((k+1), int(n/m)):
@@ -19,7 +20,9 @@ def lu_det():
         for i in range((k + 1), int(n / m)):
             for j in range((k + 1), int(n / m)):
                 schur(i,j,k)
-            return determ
+        determ = determ* sub_determ
+        log_determ = sub_log_determ + log_determ
+    return determ, log_determ
 
 
 
@@ -43,40 +46,34 @@ def schur(i,j,k):
     writesubmatrix(i,j,b)
 
 def writesubmatrix(i,k,a):
-    submatrix_file = open("submatrix_" + str(i) + "_" + str(k), "w")
-    submatrix_file.write(a)
+    submatrix_file = "submatrix_" + str(i) + "_" + str(k)
+    np.save(submatrix_file, a)
+
 
 
 def part2(i,j):
     a = readSunMatrix(i,j)
     determ = 1
     log_determ = 0
-    P, L, U = scipy.linalg.lu(a)
-    L_inv = np.linalg.inv(L * P)
+    L, U = scipy.linalg.lu(a, permute_l = True)
+    # print(P)
+    # print(L)
+    # print(U)
+    L_inv = np.linalg.inv(L)
     U_inv = np.linalg.inv(U)
-    determ = determ * (np.linalg.det(L) * np.linalg.det(U) *np.linalg.det(P))
-    log_determ += log(abs((np.linalg.det(L)))) + log(abs((np.linalg.det(U)))) + log(abs((np.linalg.det(P))))
+    determ = determ * (np.linalg.det(L) * np.linalg.det(U))
+    log_determ += log(abs((np.linalg.det(L)))) + log(abs((np.linalg.det(U))))
     return L_inv, U_inv, determ, log_determ
 
 def readSunMatrix(i,j):
-    submatrix_file = open("submatrix_" + str(i) + "_" + str(j), "r")
-    megastuffed = []
-    for k in range(0, m):
-        doublestuffed = submatrix_file.readline()
-        singlestuffed = doublestuffed.strip('[')
-        singlestuffed = singlestuffed.replace(']', ' ')
-        singlestuffed = singlestuffed.split(",")
-
-        singlestuffed = list(map(float, singlestuffed))
-        # print(singlestuffed)
-        megastuffed.append(singlestuffed)
-    megastuffed = np.reshape(megastuffed, (m,m))
+    str1 = "submatrix_" + str(i) + "_" + str(j) + ".npy"
+    megastuffed = np.load(str1)
     return megastuffed
 
 # end
 # Read the large/raw matrix and divide it into smaller block
 n = int(16)
-m = int(4)
+m = int(8)
 lst = []
 largematrix = open("m0016x0016.bin", "rb")
 output = list(range(int(n / m)))
@@ -84,38 +81,42 @@ submatrix_file = []
 for i in range(0, int(n / m)):
     A =[]
     for j in range(0, int(n/m)):
-        A.append(np.empty([]))
+        A.append(np.empty([m,m]))
     for k in range(0, m):
         for j in range(0, int(n / m)):
             block = largematrix.read(8 * m)
             line = ar.array("d", block)
-            output[j].write(str(line.tolist()) + "\n")
-    for j in range(0, int(n / m)):
-        output[j].close()
+            for p in range(0,m):
+                A[j][k,p] = line[p]
+
     for j in range(0, int(n / m)):
         str1 = "submatrix_" + str(i) + "_" + str(j)
-        output[j] = open(str1, "w")
+        #submatrix = open(str1, "w")
+        np.save(str1, A[j])
+        #submatrix.close()
+largematrix.close()
+
 # end of reading large matrix
 
 
-# Read the submatrix files and convert the submatrix into lists
-determinant_megastuffed=[]
-for i in range(0, int(n / m)):
-    for j in range(0, int(n / m)):
-
-        # Reshape the list into matrix shape
-        #megastuffed = np.reshape(megastuffed, (m,m))
-
-        # Calculate the determinant and log determinant of submatrix by using LU factorization
-        determinant_megastuffed.append(lu_det())
-        print(determinant_megastuffed)
-        #print('The determinant and log determinant are' + str(determinant_megastuffed))
+# # Read the submatrix files and convert the submatrix into lists
+# determinant_megastuffed=[]
+# for i in range(0, int(n / m)):
+#     for j in range(0, int(n / m)):
+#
+#         # Reshape the list into matrix shape
+#         #megastuffed = np.reshape(megastuffed, (m,m))
+#
+#         # Calculate the determinant and log determinant of submatrix by using LU factorization
+#         determinant_megastuffed.append(lu_det())
+#         print(determinant_megastuffed)
+#         #print('The determinant and log determinant are' + str(determinant_megastuffed))
 
 #print(len(determinant_megastuffed))
-determinant_megastuffed=np.reshape(determinant_megastuffed,(-1, int(sqrt(len(determinant_megastuffed)))))
+#determinant_megastuffed=np.reshape(determinant_megastuffed,(-1, int(sqrt(len(determinant_megastuffed)))))
 final_determinant=lu_det()
 print (final_determinant)
-submatrix_file = open("submatrix_" + str(i) + "_" + str(j), "r")
+
 
 
 
