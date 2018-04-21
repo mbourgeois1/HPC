@@ -2,7 +2,9 @@ from math import *
 import scipy.linalg
 import numpy as np
 import array as ar
-import re
+import time
+
+start_time = time.time()
 
 
 # LU Decomposition and Calculate Determinant
@@ -65,7 +67,7 @@ def part2(i,j):
     L_inv = np.linalg.inv(L)
     U_inv = np.linalg.inv(U)
     determ = determ * (np.linalg.det(L) * np.linalg.det(U))
-    log_determ += log(abs((np.linalg.det(L)))) + log(abs((np.linalg.det(U))))
+    log_determ += log10(abs((np.linalg.det(L)))) + log10(abs((np.linalg.det(U))))
     #print(np.linalg.det(L),np.linalg.det(U))
     #print(L_inv, U_inv, determ, log_determ)
     return L_inv, U_inv, determ, log_determ
@@ -105,3 +107,4 @@ largematrix.close()
 
 print (lu_det())
 
+print ("--- %s seconds ---" % (time.time() - start_time))
